@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+
+  username String @unique
+  password String
+  image    String
+
+  // every user belongs to one store
+  Store   Store?  @relation(fields: [StoreId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  StoreId String? @map("store_id")
+  // every user has many orders
+  Orders  Order[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Store {
+  id String @id @default(cuid())
+
+  name    String @unique
+  address String
+  contact String
+
+  // every store has many users
+  Users    User[]
+  // every store has many products
+  Products Product[]
+  // every store has many orders
+  Orders   Order[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("stores")
+}
+
+model Product {
+  id String @id @default(cuid())
+
+  name        String
+  description String
+  price       Float
+  stock       Int
+  image       String
+
+  // every product belongs to one store
+  Store      Store    @relation(fields: [StoreId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  StoreId    String   @map("store_id")
+  // every product belongs to many orders
+  Orders     Order[]
+  // every product belongs to one categories
+  Category   Category @relation(fields: [CategoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  CategoryId String   @map("category_id")
+  // every product belongs to one supplier
+  Supplier   Supplier @relation(fields: [SupplierId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  SupplierId String   @map("supplier_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Order {
+  id String @id @default(cuid())
+
+  // every order belongs to one user
+  User     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   String    @map("created_by")
+  // every order belongs to one store
+  Store    Store     @relation(fields: [StoreId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  StoreId  String    @map("store_id")
+  // every order has many products
+  Products Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("orders")
+}
+
+model Category {
+  id String @id @default(cuid())
+
+  name String
+
+  // every category has many products
+  Products Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Supplier {
+  id String @id @default(cuid())
+
+  name    String
+  address String
+  contact String
+
+  // every supplier has many products
+  Products Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("suppliers")
+}
