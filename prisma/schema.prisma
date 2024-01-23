@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User -> Store = one to many
+// Store -> User = many to one
+// Product -> Store = many to one
+// Order -> Product = many to many
+// Order -> User = many to one
+// Product -> Category = many to one
+// Product -> Supplier = many to one
+
 model User {
   id String @id @default(cuid())
 
